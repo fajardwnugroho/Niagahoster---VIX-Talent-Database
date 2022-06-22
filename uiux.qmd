@@ -1,0 +1,53 @@
+---
+title: "Niagahoster - UI/UX Designer"
+toc: false
+---
+
+## Dashboard for Company & Talent
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(reactable)
+library(googlesheets4)
+library(googleAuthR)
+library(tidyverse)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_uiux_niagahoster <- read_sheet("https://docs.google.com/spreadsheets/d/1V8tJnLA8fBkuLsvM2pnTWZIcG4cKc3sj6JatvOmE3_A", range = "Niagahoster - UI/UX Designer")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+df_uiux_niagahoster <- df_uiux_niagahoster |> 
+  mutate(`Total Time (hour)` = round(`Total Time (hour)`, digits = 2))
+
+df_uiux_niagahoster <- df_uiux_niagahoster |> 
+  filter(State %in% c("in_progress", "completed"))
+
+df_uiux_niagahoster <- df_uiux_niagahoster |> 
+  filter(`Batch VIX` %in% c("May", "June"))
+
+df_uiux_niagahoster_clean <- df_uiux_niagahoster[ , c("Name", "Email", "Phone Number", "Batch VIX", "State", "Advance Task Submission File 1", "Total Score", "Total Time (hour)")]
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+sticky_style <- list(backgroundColor = "#f7f7f7")
+
+
+reactable(df_uiux_niagahoster_clean, wrap = FALSE,
+  resizable = TRUE,
+  bordered = TRUE,
+  defaultSorted = list(`Batch VIX` = "asc",
+                       `State` = "asc",
+                       `Total Score` = "desc", 
+                       `Total Time (hour)` = "asc"),
+  filterable = TRUE, 
+  fullWidth = TRUE,
+  defaultPageSize = 50,
+  minRows = 10,
+          columns = list(`Advance Task Submission File 1` = colDef(html = TRUE, cell = function(value, index) {
+      sprintf('<a href="%s" target="_blank">%s</a>', df_uiux_niagahoster_clean$`Advance Task Submission File 1`[index], value)
+    })
+  ))
+```
